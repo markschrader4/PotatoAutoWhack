@@ -15,18 +15,17 @@ class ImageFinder:
         self.screenStarty = screenStarty
         self.screenEndx = screenEndx
         self.screenEndy = screenEndy
-        
-        self.grayRefImage = cv.imread(self.refImage, cv.IMREAD_GRAYSCALE)
         self.screen = ImageGrab.grab(bbox=(self.screenStartx, self.screenStarty,
                                       self.screenEndx, self.screenEndy))
         
     def get_ref_kp_and_des(self):
-        """Returns keypoints and descriptors of refImage.
+        """Returns keypoints and descriptors of gray refImage.
         """
-        return cv.ORB_create().detectAndCompute(self.grayRefImage, None)
+        grayRefImage = cv.imread(self.refImage, cv.IMREAD_GRAYSCALE)
+        return cv.ORB_create().detectAndCompute(grayRefImage, None)
     
     def get_screen_kp_and_des(self):
-        """Returns keypoints and descriptors of screen.
+        """Returns keypoints and descriptors of gray screen.
         """
         gray_screen = cv.cvtColor(np.array(self.screen), cv.COLOR_RGB2GRAY)
         return cv.ORB_create().detectAndCompute(gray_screen, None)
@@ -43,5 +42,4 @@ class ImageFinder:
         bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
         kp_ref, des_ref = self.get_ref_kp_and_des()
         kp_scrn, des_scrn = self.get_screen_kp_and_des()
-        
         return sorted(bf.match(des_ref, des_scrn), key = lambda x:x.distance)

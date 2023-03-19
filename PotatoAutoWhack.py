@@ -20,7 +20,8 @@ def main():
         kp2, des2 = Imgfind.get_screen_kp_and_des()
         matches = Imgfind.brute_force_match()
         
-        final_img = cv.drawMatches(np.array(Imgfind.grayRefImage), kp1,
+        grayRefImage = cv.imread(Imgfind.refImage, cv.IMREAD_GRAYSCALE)
+        final_img = cv.drawMatches(np.array(grayRefImage), kp1,
                                np.array(Imgfind.screen), kp2,
                                matches[:Imgfind.numMatches], None,
                                flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
