@@ -1,7 +1,9 @@
 from PIL import ImageGrab
 from win32api import GetSystemMetrics
-import cv2 as cv
-import numpy as np
+from cv2 import imread, IMREAD_GRAYSCALE, ORB_create, cvtColor, COLOR_RGB2GRAY
+from cv2 import BFMatcher, NORM_HAMMING
+from numpy import array
+
 
 class ImageFinder:
     """Matches keypoints from a reference image to the screen
@@ -21,14 +23,14 @@ class ImageFinder:
     def get_ref_kp_and_des(self):
         """Returns keypoints and descriptors of gray refImage.
         """
-        grayRefImage = cv.imread(self.refImage, cv.IMREAD_GRAYSCALE)
-        return cv.ORB_create().detectAndCompute(grayRefImage, None)
+        grayRefImage = imread(self.refImage, IMREAD_GRAYSCALE)
+        return ORB_create().detectAndCompute(grayRefImage, None)
     
     def get_screen_kp_and_des(self):
         """Returns keypoints and descriptors of gray screen.
         """
-        gray_screen = cv.cvtColor(np.array(self.screen), cv.COLOR_RGB2GRAY)
-        return cv.ORB_create().detectAndCompute(gray_screen, None)
+        gray_screen = cvtColor(array(self.screen), COLOR_RGB2GRAY)
+        return ORB_create().detectAndCompute(gray_screen, None)
     
     def update_screen(self):
         """Sets screen to what is currently on screen
@@ -39,7 +41,7 @@ class ImageFinder:
     def brute_force_match(self):
         """Returns descriptor and keypoint matches, sorted by distance.
         """
-        bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
+        bf = BFMatcher(NORM_HAMMING, crossCheck=True)
         kp_ref, des_ref = self.get_ref_kp_and_des()
         kp_scrn, des_scrn = self.get_screen_kp_and_des()
         return sorted(bf.match(des_ref, des_scrn), key = lambda x:x.distance)
