@@ -34,25 +34,96 @@ class StartPage(Frame):
         
     def start_attack_speed_up(self):
         mousepos = Mouse.getmousepos()
-        Mouse.click(500, 500)
+        storedMousePos = self.load_attack_speed_up()
+        Mouse.click(storedMousePos[0][0], storedMousePos[0][1])
         sleep(0.1)
         for i in range(30):
-            Mouse.click(500, 500)
+            Mouse.click(storedMousePos[0][0], storedMousePos[0][1])
             sleep(0.01)
         Mouse.move(mousepos[0], mousepos[1])
         
-    def menubar(self, controller):
-        emptyMenu = Menu(controller)
-        return emptyMenu
+    def load_attack_speed_up(self):
+        try:
+            filehandler = open('storedas.obj', 'rb')
+            storedMousePos = load(filehandler)
+            filehandler.close()
+        except:
+            print("Error - File does not exist")
+            storedMousePos = [500, 500]#create with default values
+        return storedMousePos
         
     def go_dim(self, controller, val):
         controller.alpha_val = val
         controller.attributes('-alpha', val)
         
+    def showHelp(self):
+        messagebox.showinfo("Information", ("Welcome to FAPIHelper. This app " +
+                               "was adapted for the f2p steam game 'Farmers " +
+                               "Against Potatoes Idle'. It currently has 2 " + 
+                               "features: Auto Potato Whack and Attack Speed Up. " +
+                               "Be mindful that both of these features will " +
+                               "take over the mouse for a limited time."))
+        
+    def menubar(self, controller):
+        menubar = Menu(controller)
+        editMenu = Menu(menubar, tearoff=0)
+        editMenu.add_command(label="Attack Speed",underline=0,
+                             command=lambda: controller.show_frame(PageEditAttackSpeed))
+        helpMenu = Menu(menubar, tearoff=0)
+        helpMenu.add_command(label="Info", underline=0,
+                             command=self.showHelp)
+        menubar.add_cascade(label="Edit", menu=editMenu)
+        menubar.add_cascade(label="Help", menu=helpMenu)
+        return menubar
+        
     def on_focus(self, controller):
         controller.geometry("200x240")
+        controller.attributes('-fullscreen', False)
         controller.attributes('-alpha', controller.alpha_val)
         
+        
+class PageEditAttackSpeed(Frame):
+    
+    def __init__(self, parent, controller):
+        Frame.__init__(self, parent)
+        self.numClicks = 0
+        self.mousePos = []
+        button_cancel = Button(self, text="CANCEL",
+                                      command=lambda: controller.show_frame(StartPage))
+        button_cancel.grid(sticky = "s")
+        
+    def clicked(self, event, controller):
+        x = event.x
+        y = event.y
+        print("Button-1 clicked at %d, %d" %(x, y))
+        self.mousePos.append((x, y))
+        print(self.mousePos)
+        self.numClicks += 1
+        if(self.numClicks == 1):
+            #save mouse info
+            filehandler = open('storedas.obj', 'wb')
+            dump(self.mousePos, filehandler)
+            filehandler.close()
+            
+            controller.show_frame(StartPage)
+            messagebox.showinfo("Success", ("Position successfully saved."))
+        
+    def menubar(self, controller):
+        emptyMenu = Menu(controller)
+        return emptyMenu
+    
+    def on_focus(self, controller):
+        #reset vals
+        self.numClicks = 0
+        self.mousePos = []
+        controller.attributes('-alpha', 0.5)
+        controller.attributes('-fullscreen', True)
+        messagebox.showinfo("How to edit", ("Click once at the " +
+                               "location the 'Attack Apeed Up' button will " +
+                               "rapidly click. To cancel, click CANCEL at " +
+                               "top left."))
+        self.bind('<Button-1>', lambda x: self.clicked(x, controller))
+            
     
 class PageAutoWhack(Frame):
     
@@ -73,12 +144,12 @@ class PageAutoWhack(Frame):
         button_back.pack(pady=10, padx=10)
         
     def start_auto_whack(self):
-        
+        try:
             self.pwhack = self.load_auto_whack()
             self.pwhack.start()
-        
-            #print("Error (most likely due to unicolored screen) - Closing")
-            #self.pwhack.close()
+        except:
+            print("Error (most likely due to unicolored screen) - Closing")
+            self.pwhack.close()
             
     def load_auto_whack(self):
         try:
@@ -94,13 +165,28 @@ class PageAutoWhack(Frame):
             print("Error - File does not exist")
             pwhack = PotatoAutoWhack()#create with default values
         return pwhack
+    
+    def showHelp(self):
+        messagebox.showinfo("Information", ("When starting, a window will " +
+                               "open with a picture, a portion of the screen, " +
+                               "and lines drawn between the two. The lines " + 
+                               "represent the closest matches between features. " +
+                               "When all of the lines are close enough, the " +
+                               "mouse will click in the general area. This " +
+                               "will stop running after 80 seconds in case " +
+                               "the mouse remains uncontrollable (which it " +
+                               "shouldn't)."))
             
     def menubar(self, controller):
         menubar = Menu(controller)
         editMenu = Menu(menubar, tearoff=0)
         editMenu.add_command(label="Screen",underline=0,
                              command=lambda: controller.show_frame(PageEditScreen))
+        helpMenu = Menu(menubar, tearoff=0)
+        helpMenu.add_command(label="Info", underline=0,
+                             command=self.showHelp)
         menubar.add_cascade(label="Edit", menu=editMenu)
+        menubar.add_cascade(label="Help", menu=helpMenu)
         return menubar
     
     def on_focus(self, controller):
@@ -119,23 +205,6 @@ class PageEditScreen(Frame):
                                       command=lambda: controller.show_frame(PageAutoWhack))
         button_cancel.grid(sticky = "s")
         
-    def menubar(self, controller):
-        emptyMenu = Menu(controller)
-        return emptyMenu
-    
-    def on_focus(self, controller):
-        #reset vals
-        self.numClicks = 0
-        self.mousePos = []
-        controller.attributes('-alpha', 0.5)
-        controller.attributes('-fullscreen', True)
-        messagebox.showinfo("How to edit screen", ("Click once at the top " +
-                               "left of the whack a potato area and once at " +
-                               "the bottom right. DO NOT include the moving " +
-                               "lights or COMBO. To cancel, click CANCEL at " +
-                               "top left."))
-        self.bind('<Button-1>', lambda x: self.clicked(x, controller))
-        
     def clicked(self, event, controller):
         x = event.x
         y = event.y
@@ -153,17 +222,19 @@ class PageEditScreen(Frame):
             messagebox.showinfo("Success", ("Screen position successfully " +
                                                "saved."))
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+    def menubar(self, controller):
+        emptyMenu = Menu(controller)
+        return emptyMenu
+    
+    def on_focus(self, controller):
+        #reset vals
+        self.numClicks = 0
+        self.mousePos = []
+        controller.attributes('-alpha', 0.5)
+        controller.attributes('-fullscreen', True)
+        messagebox.showinfo("How to edit screen", ("Click once at the top " +
+                               "left of the whack a potato area and once at " +
+                               "the bottom right. DO NOT include the moving " +
+                               "lights or COMBO. To cancel, click CANCEL at " +
+                               "top left."))
+        self.bind('<Button-1>', lambda x: self.clicked(x, controller))

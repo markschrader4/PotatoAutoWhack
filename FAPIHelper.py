@@ -1,5 +1,5 @@
 from tkinter import Tk, Frame
-from StartPage import StartPage, PageAutoWhack, PageEditScreen
+from StartPage import StartPage, PageAutoWhack, PageEditScreen, PageEditAttackSpeed
 
 # SOURCES:
 #   https://www.youtube.com/watch?v=IYHJRnVOFlw
@@ -22,7 +22,7 @@ class FAPIHelper(Tk):
         
         self.frames = {}
         
-        for F in (StartPage, PageAutoWhack, PageEditScreen):
+        for F in (StartPage, PageAutoWhack, PageEditScreen, PageEditAttackSpeed):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -46,6 +46,7 @@ class FAPIHelper(Tk):
 if __name__ == "__main__":
     fapi = FAPIHelper()
     fapi.title('FAPI Helper')
-    fapi.geometry("200x220+0+0")
+    fapi.geometry("200x240+0+0")
     fapi.attributes('-topmost', True)
+    fapi.resizable(False, False)
     fapi.mainloop()
