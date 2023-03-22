@@ -1,21 +1,21 @@
-from tkinter import Tk, Frame
+import customtkinter
 from StartPage import StartPage, PageAutoWhack, PageEditScreen, PageEditAttackSpeed
 
 # SOURCES:
 #   https://www.youtube.com/watch?v=IYHJRnVOFlw
 #   https://www.youtube.com/watch?v=A0gaXfM1UN0
-#   https://stackoverflow.com/questions/37621071/tkinter-add-menu-bar-in-frames
+#   https://github.com/TomSchimansky/CustomTkinter
 
 
-class FAPIHelper(Tk):
+class FAPIHelper(customtkinter.CTk):
     
     def __init__(self, *args, **kwargs):
         
-        Tk.__init__(self, *args, **kwargs)
+        customtkinter.CTk.__init__(self, *args, **kwargs)
         
         self.alpha_val = 1.0
         
-        container = Frame(self)
+        container = customtkinter.CTkFrame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
@@ -41,12 +41,15 @@ class FAPIHelper(Tk):
             print("no on_focus for ", frame)
         
         frame.tkraise()
-            
+    
     
 if __name__ == "__main__":
+    customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
+    customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
     fapi = FAPIHelper()
     fapi.title('FAPI Helper')
-    fapi.geometry("200x240+0+0")
+    fapi.geometry("200x200+0+0")
     fapi.attributes('-topmost', True)
     fapi.resizable(False, False)
+    fapi.protocol("WM_DELETE_WINDOW", fapi.destroy)
     fapi.mainloop()

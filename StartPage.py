@@ -1,35 +1,42 @@
-from tkinter import Frame, Label, Button, Scale, HORIZONTAL, Menu, messagebox
+from customtkinter import CTkFrame, CTkLabel, CTkFont, CTkButton, CTkSlider
+from tkinter import Menu, messagebox
 from PotatoAutoWhack import PotatoAutoWhack
 from Mouse import Mouse
 from time import sleep
 from pickle import load, dump
 
 
-class StartPage(Frame):
+class StartPage(CTkFrame):
     
     def __init__(self, parent, controller):
-        Frame.__init__(self, parent)
+        CTkFrame.__init__(self, parent)
         
-        label = Label(self, text="FAPI Helper", font=("Bulleto Killa", 18))
+        label = CTkLabel(self, text="FAPI Helper",
+                                       font=CTkFont(size=20, weight="bold"))
         label.pack(pady=10, padx=10)
         
-        button_auto_whack = Button(self, text="Auto Whack",
-                                      command=lambda: 
-                                          controller.show_frame(PageAutoWhack))
+        button_auto_whack = CTkButton(self, text="Auto Whack",
+                                      command=lambda: controller.show_frame(PageAutoWhack),
+                                          fg_color="transparent", border_width=2,
+                                          text_color=("gray10", "#DCE4EE"))
         button_auto_whack.pack(pady=5, padx=10)
         
-        button_attack_speed_up = Button(self, text="Attack Speed Up",
-                                      command=self.start_attack_speed_up)
+        button_attack_speed_up = CTkButton(self, text="Attack Speed Up",
+                                      command=self.start_attack_speed_up,
+                                      fg_color="transparent", border_width=2,
+                                          text_color=("gray10", "#DCE4EE"))
         button_attack_speed_up.pack(pady=5, padx=10)
         
-        slider_screen_alpha = Scale(self, label='Opacity', resolution=0.1,
+        slider_screen_alpha = CTkSlider(self, number_of_steps=9,
                                        command=lambda x: 
                                            self.go_dim(controller, x),
-                                       from_=0.1, to=1.0, orient=HORIZONTAL)
+                                       from_=0.1, to=1.0)
         slider_screen_alpha.set(1)
         slider_screen_alpha.pack(pady=5, padx=10)
         
-        button_quit = Button(self, text="Quit", command=controller.destroy)
+        button_quit = CTkButton(self, text="Quit", command=controller.destroy,
+                                              fg_color="transparent", border_width=2,
+                                          text_color=("gray10", "#DCE4EE"))
         button_quit.pack(pady=5, padx=10)
         
     def start_attack_speed_up(self):
@@ -77,19 +84,21 @@ class StartPage(Frame):
         return menubar
         
     def on_focus(self, controller):
-        controller.geometry("200x240")
+        controller.geometry("200x200")
         controller.attributes('-fullscreen', False)
         controller.attributes('-alpha', controller.alpha_val)
         
         
-class PageEditAttackSpeed(Frame):
+class PageEditAttackSpeed(CTkFrame):
     
     def __init__(self, parent, controller):
-        Frame.__init__(self, parent)
+        CTkFrame.__init__(self, parent)
         self.numClicks = 0
         self.mousePos = []
-        button_cancel = Button(self, text="CANCEL",
-                                      command=lambda: controller.show_frame(StartPage))
+        button_cancel = CTkButton(self, text="CANCEL",
+                                      command=lambda: controller.show_frame(StartPage),
+                                      fg_color="transparent", border_width=2,
+                                          text_color=("gray10", "#DCE4EE"))
         button_cancel.grid(sticky = "s")
         
     def clicked(self, event, controller):
@@ -125,22 +134,26 @@ class PageEditAttackSpeed(Frame):
         self.bind('<Button-1>', lambda x: self.clicked(x, controller))
             
     
-class PageAutoWhack(Frame):
+class PageAutoWhack(CTkFrame):
     
     def __init__(self, parent, controller):
-        Frame.__init__(self, parent)
+        CTkFrame.__init__(self, parent)
         self.pwhack = self.load_auto_whack()
         
-        label = Label(self, text="Auto Whack", font=("Bulleto Killa", 18))
+        label = CTkLabel(self, text="Auto Whack",
+                                       font=CTkFont(size=20, weight="bold"))
         label.pack(pady=10, padx=10)
         
-        button_start = Button(self, text="Start",
-                                      command=self.start_auto_whack)
+        button_start = CTkButton(self, text="Start",
+                                      command=self.start_auto_whack,
+                                      fg_color="transparent", border_width=2,
+                                          text_color=("gray10", "#DCE4EE"))
         button_start.pack(pady=3, padx=10)
         
-        button_back = Button(self, text="Main Menu",
-                                      command=lambda: 
-                                          controller.show_frame(StartPage))
+        button_back = CTkButton(self, text="Main Menu",
+                                      command=lambda: controller.show_frame(StartPage),
+                                      fg_color="transparent", border_width=2,
+                                          text_color=("gray10", "#DCE4EE"))
         button_back.pack(pady=10, padx=10)
         
     def start_auto_whack(self):
@@ -195,14 +208,16 @@ class PageAutoWhack(Frame):
         controller.geometry("200x140+0+0")
     
     
-class PageEditScreen(Frame):
-    
+class PageEditScreen(CTkFrame):
+    #!!KNOWN BUG: editing screen twice in one session does not work - have to restart.
     def __init__(self, parent, controller):
-        Frame.__init__(self, parent)
+        CTkFrame.__init__(self, parent)
         self.numClicks = 0
         self.mousePos = []
-        button_cancel = Button(self, text="CANCEL",
-                                      command=lambda: controller.show_frame(PageAutoWhack))
+        button_cancel = CTkButton(self, text="CANCEL",
+                                      command=lambda: controller.show_frame(PageAutoWhack),
+                                      fg_color="transparent", border_width=2,
+                                          text_color=("gray10", "#DCE4EE"))
         button_cancel.grid(sticky = "s")
         
     def clicked(self, event, controller):
@@ -236,5 +251,6 @@ class PageEditScreen(Frame):
                                "left of the whack a potato area and once at " +
                                "the bottom right. DO NOT include the moving " +
                                "lights or COMBO. To cancel, click CANCEL at " +
-                               "top left."))
+                               "top left. !!KNOWN BUG: editing screen twice " +
+                               "in one session does not work - have to restart."))
         self.bind('<Button-1>', lambda x: self.clicked(x, controller))
